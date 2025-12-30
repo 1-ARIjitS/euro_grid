@@ -1,10 +1,10 @@
-# euro_grid — Setup & Run Instructions
+# Setup & Run Instructions
 
-This repository is **notebook-first**: the full pipeline (data ingestion → QA → EDA → forecasting → AI QA → `submission.csv`) is implemented in **`euro_grid_forecast.ipynb`**. You should start there and run the notebook top-to-bottom.
+This repository is **notebook-first**: the full pipeline (data ingestion → QA → EDA → forecasting → AI QA → `submission.csv`) is implemented in **`euro_grid_forecast.ipynb`**. You should start there and run the notebook top to bottom.
 
 ## Prerequisites
 
-- **Python**: 3.12 recommended (matches the notebook kernel metadata)
+- **Python**: 3.12+ (recommended)
 - **API keys**:
   - **ENTSO‑E**: `ENTSOE_API_KEY` (required to fetch data)
   - **OpenAI**: `OPENAI_API_KEY` (required for the LangGraph/LLM QA section)
@@ -55,7 +55,9 @@ Notes:
 Launch Jupyter from the repo root:
 
 ```bash
-jupyter lab
+jupyter lab 
+# OR
+jupyter notebook
 ```
 
 Open **`euro_grid_forecast.ipynb`** and run **Run All** (or execute sections in order).
