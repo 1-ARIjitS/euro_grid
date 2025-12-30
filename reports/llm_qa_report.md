@@ -1,98 +1,107 @@
 # Data Quality Assessment Report
 
 ## 1. Executive Summary
-- Overall data quality score: 85.0%
-- Most critical finding: Two UTC dates do not contain a full set of 24 hourly records (partial days), indicating the series does not align to UTC calendar day boundaries.
-- Readiness: Conditionally ready for hourly trading/analysis; minor calendar alignment and one solar-night anomaly should be addressed before daily-level analytics or calendar‑based features are produced.
+- Overall data quality score: 87.5% (21/24 checks passed)
+- Most critical finding: Two UTC calendar days are incomplete (not exactly 24 hourly records), indicating the time window is not aligned to midnight boundaries. While the series is continuous and hourly, daily aggregations for those two days will be biased.
+- Data readiness: Suitable for hourly trading and modeling with minor caveats; daily KPI/reporting requires boundary alignment and validation of one flagged outlier.
 
 ## 2. Validation Results Overview
+
 | Check | Status | Impact |
 |-------|--------|--------|
-| 1. Timestamps parseable to UTC | ✓ | Foundational integrity; enables reliable time joins and timezone logic |
-| 2. Timestamps unique | ✓ | No overlapping records; prevents double-counting |
-| 3. 24 records per UTC day | ✗ | Two partial UTC days; daily aggregates/features may be biased |
-| 4. Each UTC day has hours 0–23 once | ✗ | Missing hours on two days; daily completeness not guaranteed |
-| 5. Strict hourly spacing (UTC) | ✓ | Continuous hourly series without gaps/overlaps |
-| 6. Aligned to top of the hour | ✓ | Clean hourly alignment; safe for resampling/joins |
-| 7. Full-year row count (8760) | ✓ | Expected annual coverage (non‑leap year) present |
-| 8. Day-ahead price non-null | ✓ | Completeness for pricing analytics |
-| 9. Load forecast non-null | ✓ | Completeness for demand modeling |
-| 10. Wind forecast non-null | ✓ | Completeness for renewable modeling |
-| 11. Solar forecast non-null | ✓ | Completeness for renewable modeling |
-| 12. Price in plausible bounds [-500, 5000] EUR/MWh | ✓ | No extreme price outliers |
-| 13. Load forecast non-negative | ✓ | Valid physical sign; avoids sign-related model errors |
-| 14. Wind forecast non-negative | ✓ | Valid physical sign |
-| 15. Solar forecast non-negative | ✓ | Valid physical sign |
-| 16. Load implausibly high (>150 GW) | ✓ | No unrealistic large-zone load values |
-| 17. Wind implausibly high (>100 GW) | ✓ | No unrealistic wind values |
-| 18. Solar implausibly high (>100 GW) | ✓ | No unrealistic solar values |
-| 19. Solar near-zero at night (23:00–02:00 Europe/Brussels) | ✗ | One minor violation; likely modeling/tz noise |
-| 20. Summer midday solar > 0.1 (Jun–Jul 10:00–14:00 Brussels) | ✓ | Seasonal/diurnal sanity confirmed |
+| 1. Timestamps parseable (UTC) | ✓ | Foundational time alignment assured |
+| 2. No duplicate UTC timestamps | ✓ | Uniqueness ensured |
+| 3. Top-of-hour alignment | ✓ | Hourly granularity consistent |
+| 4. Each UTC day has 24 records | ✗ | Two UTC days partial; daily aggregates biased |
+| 5. Consecutive timestamps spaced 1h | ✓ | Continuity guaranteed |
+| 6. Exactly 8760 hourly rows | ✓ | Annual completeness (non‑leap year) |
+| 7. Prices non-null | ✓ | No missing prices for trading/analytics |
+| 8. Load forecasts non-null | ✓ | No missing load values |
+| 9. Wind forecasts non-null | ✓ | No missing wind values |
+| 10. Solar forecasts non-null | ✓ | No missing solar values |
+| 11. Prices within Euphemia bounds | ✓ | No bound violations |
+| 12. Load positive/plausible | ✓ | No physically implausible load values |
+| 13. Wind non-negative/plausible | ✓ | No implausible wind values |
+| 14. Solar non-negative/plausible | ✓ | No implausible solar values |
+| 15. Solar negligible at deep night (23:00–02:00 Brussels) | ✗ | 1 row > 0.1 MW; potential tz/source glitch |
+| 16. Price 6-sigma outlier | ✗ | 1 extreme value; may affect model training |
+| 17. Load 6-sigma outlier | ✓ | No extreme load outliers |
+| 18. Wind 6-sigma outlier | ✓ | No extreme wind outliers |
+| 19. Solar 6-sigma outlier | ✓ | No extreme solar outliers |
+| 20. Hourly price jumps > 1000 EUR/MWh | ✓ | No unrealistic price spikes |
+| 21. Hourly load ramps > 30,000 MW | ✓ | No unrealistic load ramps |
+| 22. Hourly wind ramps > 20,000 MW | ✓ | No unrealistic wind ramps |
+| 23. Hourly solar ramps > 20,000 MW | ✓ | No unrealistic solar ramps |
+| 24. RES (wind+solar) > 3x load | ✓ | No implausible RES dominance |
 
 ## 3. Detailed Findings
 
 ### 3.1 Passed Validations
-- Timestamp integrity (parseable, unique, strictly hourly, on-the-hour): Ensures consistent time alignment for balancing, PnL attribution, feature engineering, and reconciliation with external feeds (e.g., ENTSO‑E, EEX).
-- Full-year coverage (8760 rows): Supports annual backtests and year-over-year comparisons.
-- Completeness (no nulls across price/forecasts): Prevents imputation bias and pipeline failures in forecasting and optimization.
-- Value plausibility (price bounds, non-negative forecasts, no implausible maxima): Reduces risk of model instability due to outliers or unit errors.
-- Seasonal/diurnal solar sanity (summer midday positive): Confirms realism in renewables behavior that downstream models expect.
+- Timestamp integrity: Parseable UTC timestamps, unique, aligned to HH:00:00, and strictly 1h spacing ensure robust time-series continuity—critical for backtesting, curve building, and PnL attribution.
+- Completeness: Exactly 8,760 rows confirms non‑leap‑year hourly coverage (aggregate completeness).
+- Non-null coverage: No missing values in price_da, load_forecast, wind_forecast, solar_forecast—enables uninterrupted model training and reporting.
+- Range plausibility: Prices within Euphemia bounds; load/wind/solar within plausible physical ranges—limits risk of unit errors and gross outliers.
+- Volatility/ramps: No unrealistic hourly jumps in price or ramps in load/wind/solar—reduces risk of timestamp misalignment and ingestion spikes.
+- Distribution checks: No 6‑sigma outliers in load, wind, or solar—supports model stability for these features.
+- System balance plausibility: RES not exceeding 3x load—guards against implausible overgeneration in a single bidding zone.
 
-Why it matters for energy trading:
-- Reliable, continuous, and clean hourly series underpins accurate backtesting, hedging strategy evaluation, and real-time decision support.
-- Physically plausible forecasts reduce spurious signals in ML models and improve confidence in risk and dispatch decisions.
+Why this matters: For energy trading, clean hourly structure and realistic magnitudes are essential to prevent mispriced orders, ensure correct VaR calculations, and produce reliable demand/supply forecasts.
 
 ### 3.2 Failed Validations
-1) Rule 3: Each UTC day must have exactly 24 hourly records
-- Potential root cause: Dataset start/end not aligned to UTC midnight, creating two partial UTC days (first/last day). Less likely: mis-specified extraction window.
-- Impact: Daily aggregates (e.g., daily averages, peak/off-peak splits), calendar-based features (day-of-week/day-of-month) can be biased for those two days; daily backtests may misalign.
+1) Each UTC day must have exactly 24 records (2 UTC dates fail)
+- Potential root cause:
+  - The dataset window is continuous hourly but offset from midnight boundaries (e.g., starts/ends mid‑day), producing two partial UTC days. Less likely: parsing boundary artifacts.
+- Impact:
+  - Daily aggregates (e.g., average price, demand totals) for those two days will be biased, impacting daily KPIs, settlement reconciliations, and reporting.
 - Severity: Medium
 
-2) Rule 4: Every UTC day must contain exactly one of each hour 0–23
-- Potential root cause: Same as Rule 3 (partial days). Not indicative of internal gaps, given strict hourly continuity passed.
-- Impact: Same as Rule 3; daily completeness checks and per-day features may be affected on those two days.
-- Severity: Medium
-
-3) Rule 19: Solar must be negligible (<0.1) during deep night (23:00–02:00, Europe/Brussels)
-- Potential root cause: Minor model noise or smoothing near twilight; possible timezone edge around DST transition or rounding.
-- Impact: Negligible for aggregate modeling but could affect strict rule-based QC or calibration routines that assume zero nighttime solar.
+2) Solar must be negligible (< 0.1 MW) during deep night (23:00–02:00 Europe/Brussels) (1 row fails)
+- Potential root cause:
+  - Minor timezone misalignment or forecast smoothing/rounding that yields a small nonzero value during night; ingestion mapping of local vs UTC may be off by one hour around DST edges.
+- Impact:
+  - Negligible effect on aggregate metrics; can slightly distort night RES share or model features that assume zero solar at night.
 - Severity: Low
+
+3) Price 6‑sigma outlier detection (1 row fails)
+- Potential root cause:
+  - Likely a legitimate market extreme (max observed 473.28 EUR/MWh; within Euphemia bounds and without unrealistic jump). Less likely: decimal/units ingestion issue.
+- Impact:
+  - Can unduly influence model training or scaling if not handled with robust methods; may affect alerts or risk thresholds.
+- Severity: Medium
 
 ## 4. Risk Assessment
 - Data Reliability Rating: High
 - Key risks for production use:
-  - Calendar misalignment (two partial UTC days) can distort day-level KPIs, settlement-day analytics, and daily feature creation unless corrected or trimmed.
-  - Minor solar-night anomaly suggests either rounding noise or timezone edge cases; if unaddressed, could trigger false QC alarms.
-  - Ambiguity in timestamp column name ("Unnamed: 0") increases risk of misuse or incorrect timezone handling downstream.
+  - Misaligned daily boundaries causing biased daily aggregates for two UTC days.
+  - Single price 6‑sigma outlier influencing models/alerts if not robustly handled.
+  - Minor timezone/ingestion nuance leading to nonzero solar at deep night.
+  - Timestamp column currently named “Unnamed: 0” (object dtype); clarity and typing should be enforced for downstream systems.
 - Confidence level for forecasting models:
-  - Hourly models: High
-  - Daily-aggregate models: Medium–High (after calendar alignment fix)
+  - High for load/wind/solar given completeness, plausibility, and smooth ramps.
+  - High (with caution) for price modeling; confirm outlier provenance and use robust scaling or outlier-aware training.
 
 ## 5. Recommendations
-1. Align time coverage to UTC calendar boundaries:
-   - Option A (preferred for daily analytics): Trim to full UTC days (start at 00:00:00Z, end at 23:00:00Z).
-   - Option B: Pad missing hours for the partial days and impute (document imputation).
-2. Investigate the two failing UTC dates:
-   - Confirm start/end timestamps; document extraction window; ensure future pulls are calendar-aligned.
-3. Address nighttime solar anomaly:
-   - Verify tz conversion to Europe/Brussels at DST edges and, if confirmed, apply a small night-floor (e.g., clip to 0 during astronomical night or <0.1 MW).
-4. Improve schema clarity:
-   - Rename “Unnamed: 0” to “timestamp_utc” and store as datetime64[ns, UTC].
-5. Add production monitoring:
-   - Daily check for 24 records per UTC day, uniqueness, strict hourly spacing, and solar night sanity; alert on violations.
-6. Documentation and SLAs:
-   - Specify coverage, units, timezone handling, and acceptable tolerance for near-zero solar at night.
-7. Recompute daily aggregates/backtests post-fix to ensure consistency in reporting and model training datasets.
+1. Normalize the time window to exact UTC calendar day boundaries (00:00 to 23:00) and re-run daily completeness check; trim/pad the first/last day as needed.
+2. Validate the single 6‑sigma price hour against ENTSO‑E/exchange; if confirmed legitimate, whitelist it for training or apply robust scaling (e.g., median/IQR, Huber loss) rather than clipping.
+3. Review and lock timezone handling:
+   - Ensure source timestamps are mapped consistently (ENTSO‑E often publishes in local CET/CEST). Keep a tz-aware UTC column and verify Europe/Brussels conversions across DST transitions.
+4. Address the night‑time solar anomaly:
+   - If caused by timezone misalignment, fix upstream; otherwise cap negligible nocturnal values to ≤0.1 MW post‑validation with proper data quality flags.
+5. Promote the timestamp to a typed, tz-aware index with a clear name (e.g., datetime_utc) and persist schema contracts in the ingestion layer.
+6. Add CI guardrails to fail ingestion when:
+   - Any UTC day ≠ 24 records
+   - Night‑time solar > 0.1 MW
+   - Unexpected unit/range violations
+7. Implement a lightweight DQ dashboard and alerting for all 24 checks, with special focus at year boundaries and DST weekends.
 
 ## 6. Conclusion
-- Final verdict: Conditional
+- Final verdict: Conditional Yes
 - Required actions before production use:
-  - Align to UTC calendar days (trim or pad/impute the two partial days).
-  - Resolve or accept-with-documented-tolerance the single nighttime solar breach.
-  - Rename timestamp column and enforce UTC dtype.
-- Suggested monitoring:
-  - Automated daily QC for per-day counts, timestamp uniqueness/spacing, and renewable diurnal sanity (including DST windows).
-  - Versioned data extracts with logged coverage windows to prevent future boundary drift.
+  - Align the dataset to full UTC calendar days or clearly communicate and handle the two partial days in daily reporting.
+  - Confirm and document the single price outlier; adopt robust modeling practices.
+  - Verify timezone handling to eliminate the night‑time solar anomaly; standardize timestamp column and index.
+- Suggested monitoring going forward:
+  - Keep the three failing rules on alert, add boundary/DST-focused tests, and continuously track outlier frequencies to detect drift.
 
 ---
 Generated by LLM-Driven QA Pipeline
