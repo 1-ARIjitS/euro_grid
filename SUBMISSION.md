@@ -1,4 +1,4 @@
-# European Power Grid Forecasting — Day-Ahead Price Forecasting (France, FR)
+# European Power Grid Forecasting Day-Ahead Price Forecasting (France, FR)
 
 **Author:** ARIJIT SAMAL  
 **Email:** arijit.samal@student-cs.fr  
@@ -32,12 +32,12 @@ This submission contains an end-to-end pipeline for forecasting **hourly day-ahe
 ## 2. Data Ingestion (Section 2)
 
 ### Data Sources
-| Data Type | ENTSO-E Code | Granularity | Role |
-|-----------|--------------|-------------|------|
-| Day-Ahead Prices | A44 | Hourly | **TARGET** |
-| Load Forecast | A65 | Hourly | Driver 1 |
-| Wind Forecast | A69 | Hourly | Driver 2 |
-| Solar Forecast | A69 | Hourly | Driver 3 |
+| Data Type | Granularity | Role |
+|-----------|-------------|------|
+| Day-Ahead Prices | Hourly | **TARGET** |
+| Load Forecast | Hourly | Driver 1 |
+| Wind Forecast | Hourly | Driver 2 |
+| Solar Forecast | Hourly | Driver 3 |
 
 ### Implementation
 - **API Client:** `entsoe-py` library
