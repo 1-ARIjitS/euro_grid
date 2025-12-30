@@ -1,0 +1,134 @@
+{
+  "missing_values": {
+    "counts": {
+      "price_da": 0,
+      "load_forecast": 1,
+      "wind_forecast": 1,
+      "solar_forecast": 1
+    },
+    "percentages": {
+      "price_da": 0.0,
+      "load_forecast": 0.011414222120762471,
+      "wind_forecast": 0.011414222120762471,
+      "solar_forecast": 0.011414222120762471
+    },
+    "total_rows": 8761,
+    "complete_rows": 8760,
+    "complete_pct": 99.98858577787924
+  },
+  "duplicates": {
+    "count": 0,
+    "percentage": 0.0,
+    "duplicate_indices": []
+  },
+  "outliers": {
+    "price_da": {
+      "iqr_outliers": 35,
+      "zscore_outliers": 38,
+      "lower_bound": -87.90499999999999,
+      "upper_bound": 202.375,
+      "min": -118.01,
+      "max": 473.28
+    },
+    "load_forecast": {
+      "iqr_outliers": 46,
+      "zscore_outliers": 18,
+      "lower_bound": 19085.546875,
+      "upper_bound": 79588.671875,
+      "min": 28414.625,
+      "max": 84010.5
+    },
+    "wind_forecast": {
+      "iqr_outliers": 283,
+      "zscore_outliers": 148,
+      "lower_bound": -4912.543750000002,
+      "upper_bound": 15602.346250000002,
+      "min": 279.45374,
+      "max": 22902.76
+    },
+    "solar_forecast": {
+      "iqr_outliers": 262,
+      "zscore_outliers": 33,
+      "lower_bound": -9751.89,
+      "upper_bound": 16253.15,
+      "min": 0.0,
+      "max": 19745.7
+    }
+  },
+  "coverage": {
+    "expected_hours": 8761,
+    "actual_hours": 8761,
+    "hourly_coverage_pct": 100.0,
+    "monthly_counts": {
+      "2024-12": 48,
+      "2025-01": 744,
+      "2025-02": 672,
+      "2025-03": 743,
+      "2025-04": 720,
+      "2025-05": 744,
+      "2025-06": 720,
+      "2025-07": 744,
+      "2025-08": 744,
+      "2025-09": 720,
+      "2025-10": 745,
+      "2025-11": 720,
+      "2025-12": 697
+    }
+  },
+  "data_types": {
+    "price_da": "float64",
+    "load_forecast": "float64",
+    "wind_forecast": "float64",
+    "solar_forecast": "float64"
+  },
+  "value_ranges": {
+    "price_da": {
+      "expected_range": [
+        -500,
+        1000
+      ],
+      "actual_range": [
+        -118.01,
+        473.28
+      ],
+      "below_minimum": 0,
+      "above_maximum": 0
+    },
+    "load_forecast": {
+      "expected_range": [
+        25000,
+        100000
+      ],
+      "actual_range": [
+        28414.625,
+        84010.5
+      ],
+      "below_minimum": 0,
+      "above_maximum": 0
+    },
+    "wind_forecast": {
+      "expected_range": [
+        0,
+        25000
+      ],
+      "actual_range": [
+        279.45374,
+        22902.76
+      ],
+      "below_minimum": 0,
+      "above_maximum": 0
+    },
+    "solar_forecast": {
+      "expected_range": [
+        0,
+        20000
+      ],
+      "actual_range": [
+        0.0,
+        19745.7
+      ],
+      "below_minimum": 0,
+      "above_maximum": 0
+    }
+  }
+}

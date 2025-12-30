@@ -1,4 +1,30 @@
-entsoe-py>=0.6.0
-pandas>=2.0.0
-python-dotenv>=1.0.0
-matplotlib>=3.7.0
+# Data Ingestion & Processing
+entsoe-py
+pandas
+numpy
+python-dotenv
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Machine Learning
+scikit-learn
+lightgbm
+xgboost
+statsmodels
+
+# AI/LLM Integration
+openai
+langchain
+langchain-openai
+langgraph
+
+# Jupyter & Utilities
+jupyter
+ipykernel
+tqdm
+
+# Output & Reporting
+tabulate
