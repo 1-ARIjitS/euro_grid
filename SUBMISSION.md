@@ -21,16 +21,10 @@ This submission contains an end-to-end pipeline for forecasting **hourly day-ahe
 ## 1. Pipeline Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Data Ingestion │ ─▶ │  Data Quality   │ ─▶ │       EDA       │ ─▶ │   Forecasting   │
-│   (ENTSO-E API) │    │   (QA Checks)   │    │  (Visualization)│    │   (ML Models)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                                              │
-                       ┌─────────────────┐    ┌─────────────────┐             ▼
-                       │   LLM-Driven    │ ◀─ │  Prompt Curve   │ ◀─ ┌─────────────────┐
-                       │   QA Report     │    │   Translation   │    │   Submission    │
-                       └─────────────────┘    └─────────────────┘    │   (CSV Export)  │
-                                                                     └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Data Ingestion │ ─▶ │  Data Quality   │ ─▶ │       EDA       │ ─▶ │   Forecasting   │ ─▶ │  Prompt Curve   │ ─▶ │   LLM-Driven    │ ─▶ │   Submission    │
+│   (ENTSO-E API) │    │   (QA Checks)   │    │ (Visualization) │    │   (ML Models)   │    │   Translation   │    │   QA Report     │    │   (CSV Export)  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ---
